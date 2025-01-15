@@ -1,0 +1,6 @@
+# zig
+.zig-cache
+
+# program output
+main
+main.o
