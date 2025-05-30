@@ -15,11 +15,15 @@
 //!
 //! zig test src/main.zig -lc -I src
 //! zig build-exe src/main.zig -lc -I src
+//! zig build-exe src/main.zig src/c_api.c -lc -I src   # ALT WITH HEADER FILE
 
 const std = @import("std");
 
+// const c_api = @import("c_api");
+
 const c_api = @cImport({
-    @cInclude("./c_api.c");
+    // @cInclude("c_api.h");
+    @cInclude("c_api.c");
 });
 
 pub fn main() !void {
@@ -36,6 +40,8 @@ pub fn main() !void {
     try stdout.print("Run `zig build test` to run the tests.\n", .{});
 
     try bw.flush(); // don't forget to flush!
+
+    c_api.special_print(12);
 }
 
 test "simple test" {
@@ -48,4 +54,11 @@ test "simple test" {
 test "c test" {
     const res = c_api.special_fn(12);
     try std.testing.expectEqual(@as(u32, 144), res);
+}
+
+test "c print test" {
+    // const res = c_api.special_fn(12);
+    // try std.testing.expectEqual(@as(u32, 144), res);
+
+    c_api.special_print(12);
 }

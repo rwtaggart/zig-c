@@ -29,12 +29,42 @@ pub fn build(b: *std.Build) void {
     // running `zig build`).
     b.installArtifact(lib);
 
+    // ADD ADDITIONAL C-based LIBRARY
+    // Only use b.dependency if the package is listed in "build.zig.zon"
+    // const c_api = b.dependency("C_API", .{ .target = target, .optimize = optimize });
+    const c_api_lib = b.addStaticLibrary(.{
+        .name = "c_api",
+        .target = target,
+        .optimize = optimize,
+    });
+
+    c_api_lib.addCSourceFiles(.{
+        .root = b.path("src"),
+        .files = &.{
+            // "c_api.h",
+            "c_api.c",
+        },
+        .flags = &.{
+            "-Wall",
+            "-Werror",
+        },
+    });
+    // TODO: Are these required and what are they for?
+    // sqlite3_lib.addIncludePath(sqlite3.path(""));
+    // sqlite3_lib.installHeadersDirectory(sqlite3.path(""), "", .{ .include_extensions = &.{"h"} });
+    b.installArtifact(c_api_lib);
+
     const exe = b.addExecutable(.{
         .name = "zig-c",
         .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
     });
+
+    exe.linkLibC();
+    exe.linkLibrary(c_api_lib);
+    // exe.addIncludePath(c_api_lib.getEmittedIncludeTree());  // => BROKEN
+    exe.addIncludePath(b.path("src")); // => WORKS
 
     // This declares intent for the executable to be installed into the
     // standard location when the user invokes the "install" step (the default
