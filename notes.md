@@ -41,12 +41,25 @@ build.zig
 
 
 # Notes
-WORKS ON MAC
+WORKS ON MAC OS
 ```sh
+# No Targets
+zig build-exe src/main.zig -lc -I src
+zig test src/main.zig -lc -I src
 zig build
+zig build run
+zig build test --summary all
+
+# With Targets
+zig build-exe -target x86_64-windows src/main.zig -lc -I src
 ```
 
-FAILS ON MAC
+FAILS ON MAC OS
 ```sh
+# With Targets
 zig build -Dtarget=x86_64-windows
 ```
+
+# Targets
+zig build-exe --help | grep target
+zig build --help | grep target 
