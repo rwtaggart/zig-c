@@ -1,5 +1,7 @@
 /**
  *  C API Example
+ *  Simple example of including C files in a Zig project.
+ *  Uses the c lib standard library
  */
 
 #include <stdio.h>
