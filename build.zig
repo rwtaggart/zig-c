@@ -30,7 +30,7 @@ pub fn build(b: *std.Build) void {
     b.installArtifact(lib);
 
     // ADD ADDITIONAL C-based LIBRARY
-    // Only use b.dependency if the package is listed in "build.zig.zon"
+    // Note: only use b.dependency if the package is listed in "build.zig.zon"
     // const c_api = b.dependency("C_API", .{ .target = target, .optimize = optimize });
     const c_api_lib = b.addStaticLibrary(.{
         .name = "c_api",
@@ -43,6 +43,7 @@ pub fn build(b: *std.Build) void {
         .files = &.{
             // "c_api.h",
             "c_api.c",
+            "a_api.c",
         },
         .flags = &.{
             "-Wall",
@@ -102,6 +103,10 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
+    lib_unit_tests.linkLibC();
+    lib_unit_tests.linkLibrary(c_api_lib);
+    lib_unit_tests.addIncludePath(b.path("src")); // => WORKS
+
     const run_lib_unit_tests = b.addRunArtifact(lib_unit_tests);
 
     const exe_unit_tests = b.addTest(.{
@@ -109,6 +114,10 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
+
+    exe_unit_tests.linkLibC();
+    exe_unit_tests.linkLibrary(c_api_lib);
+    exe_unit_tests.addIncludePath(b.path("src")); // => WORKS
 
     const run_exe_unit_tests = b.addRunArtifact(exe_unit_tests);
 
